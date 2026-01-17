@@ -22,7 +22,7 @@ The course focuses on the foundations, principles, and practical techniques of c
 
 ---
 
-## 🧪 Assignments Overview
+## Assignments Overview
 
 | Homework | Topic |
 |--------|------|
@@ -36,11 +36,11 @@ Each assignment is located in its own directory and includes source code and a b
 
 ---
 
-## 🛠️ Technologies & Tools
+## Technologies & Tools
 
-Depending on the assignment, the following tools and environments may be used:
+Depending on the assignment, the following tools and environments will be used:
 
-- C / C++
+- C / Java
 - pthreads
 - OpenMP
 - Java Threads and Concurrent Utilities
