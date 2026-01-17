@@ -6,7 +6,7 @@ The course focuses on the foundations, principles, and practical techniques of c
 
 ---
 
-## 📚 Course Topics
+## Course Topics
 
 - Concurrent programming concepts, models, and paradigms
 - Processes and threads
@@ -50,7 +50,7 @@ Depending on the assignment, the following tools and environments will be used:
 
 ---
 
-## 🎯 Learning Objectives
+## Learning Objectives
 
 Through these assignments, the goal is to:
 
