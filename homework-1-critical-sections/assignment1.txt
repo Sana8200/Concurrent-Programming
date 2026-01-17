@@ -7,24 +7,7 @@ to build a concurrent (parallel) program of multiple threads with shared variabl
 to create and join concurrent threads and pass input parameters and results;
 to synchronize threads with locks, barriers, and condition variables,
 to compile and run a concurrent program using Pthreads (or Java threads and concurrent utilities)
-Reading/Links
-Lecture 6: Introduction to Pthreads.
-Lecture 7: Threads, Locks, and Conditions in Java SE JDK
-Tutorial: POSIX Threads ProgrammingLinks to an external site.
-Threads API Manual
-Pthread APIs - IBMLinks to an external site.
-Chapter 4 - Shared-memory programming with Pthreads in "An Introduction to Parallel Programming" by Peter S. Pacheco and Matthew Malensek. Available online via KTH library.
-Programming environments (language and libraries):
-C/C++, the Pthread library.
-Optional: Java using threads and concurrent utilities, namely the ReentrantLockLinks to an external site. class and the Condition Links to an external site.interface from the java.util.concurrent.locksLinks to an external site. package
-See also "Programming Environments. Related Links".
-Task
-There are 7 problems below, which are worth as follows.
 
-Problems	Points
-1-5	20 each
-6, 7	40 each
-You are to solve any combination of the problems that add up to 40 points. Read also general requirements for homework, grading, and bonus policies. You may discuss the meaning of questions with classmates, but the work you turn in must be yours alone.
 
 Problems
 1. Compute the Sum, Min, and Max of Matrix Elements (20 points)
