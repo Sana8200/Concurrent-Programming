@@ -110,14 +110,14 @@ int main(int argc, char *argv[]) {
   start_time = read_timer();
   for (l = 0; l < numWorkers; l++)
     pthread_create(&workerid[l], &attr, Worker, (void *) l);  // creating the workers 
-  pthread_exit(NULL);
+  pthread_exit(NULL);  // main thread exits, others continure until finished
 }
 
 // each worker thread executes this function
 /* Each worker sums the values in one strip of the matrix.
    After a barrier, worker(0) computes and prints the total */
 void *Worker(void *arg) {
-  long myid = (long) arg;
+  long myid = (long) arg;  // getting my thread id - using long because in pthread we cast id to void, now cast back to long
   int total, i, j, first, last;
 
 #ifdef DEBUG
@@ -164,7 +164,7 @@ void *Worker(void *arg) {
 
   Barrier();
 
-  // Last worker computes sums, max and min
+  // worker with id 0 computes final results
   if (myid == 0) {
     total = 0;
     for (i = 0; i < numWorkers; i++){
