@@ -9,7 +9,7 @@
      a.out size numWorkers
 
 */
-#ifndef _REENTRANT 
+#ifndef _REENTRANT    // reentrant makes sure the program is thread-safe
 #define _REENTRANT 
 #endif 
 #include <pthread.h>
@@ -28,14 +28,14 @@ int numArrived = 0;       /* number who have arrived */
 
 /* a reusable counter barrier */
 void Barrier() {
-  pthread_mutex_lock(&barrier);
-  numArrived++;
-  if (numArrived == numWorkers) {
-    numArrived = 0;
-    pthread_cond_broadcast(&go);
+  pthread_mutex_lock(&barrier);    // acquire the barrier lock
+  numArrived++;    // increment the number of arrived workers
+  if (numArrived == numWorkers) {    // all workers have arrived
+    numArrived = 0;    // reset the counter
+    pthread_cond_broadcast(&go);    // wake up all waiting workers
   } else
-    pthread_cond_wait(&go, &barrier);
-  pthread_mutex_unlock(&barrier);
+    pthread_cond_wait(&go, &barrier);    // wait for the barrier
+  pthread_mutex_unlock(&barrier);  // release the barrier lock
 }
 
 /* timer */
@@ -57,6 +57,13 @@ int size, stripSize;  /* assume size is multiple of numWorkers */
 int sums[MAXWORKERS]; /* partial sums */
 int matrix[MAXSIZE][MAXSIZE]; /* matrix */
 
+int max_val[MAXWORKERS];       // maximum numbers from each worker
+int max_val_col[MAXWORKERS];    // column indices of maximum numbers
+int max_val_row[MAXWORKERS];    // row indices of maximum numbers
+int min_val[MAXWORKERS];      // minimum numbers from each worker
+int min_val_col[MAXWORKERS];      // column indices of minimum numbers
+int min_val_row[MAXWORKERS];      // row indices of minimum numbers
+
 void *Worker(void *);
 
 /* read command line, initialize, and create threads */
@@ -75,16 +82,16 @@ int main(int argc, char *argv[]) {
   pthread_cond_init(&go, NULL);
 
   /* read command line args if any */
-  size = (argc > 1)? atoi(argv[1]) : MAXSIZE;
+  size = (argc > 1)? atoi(argv[1]) : MAXSIZE;   // size of the matrix is from command line or default
   numWorkers = (argc > 2)? atoi(argv[2]) : MAXWORKERS;
   if (size > MAXSIZE) size = MAXSIZE;
   if (numWorkers > MAXWORKERS) numWorkers = MAXWORKERS;
-  stripSize = size/numWorkers;
+  stripSize = size/numWorkers;  // strip of rows divided among workers equally
 
   /* initialize the matrix */
   for (i = 0; i < size; i++) {
 	  for (j = 0; j < size; j++) {
-          matrix[i][j] = 1;//rand()%99;
+          matrix[i][j] = rand() % 5;  
 	  }
   }
 
@@ -102,10 +109,11 @@ int main(int argc, char *argv[]) {
   /* do the parallel work: create the workers */
   start_time = read_timer();
   for (l = 0; l < numWorkers; l++)
-    pthread_create(&workerid[l], &attr, Worker, (void *) l);
+    pthread_create(&workerid[l], &attr, Worker, (void *) l);  // creating the workers 
   pthread_exit(NULL);
 }
 
+// each worker thread executes this function
 /* Each worker sums the values in one strip of the matrix.
    After a barrier, worker(0) computes and prints the total */
 void *Worker(void *arg) {
@@ -120,21 +128,73 @@ void *Worker(void *arg) {
   first = myid*stripSize;
   last = (myid == numWorkers - 1) ? (size - 1) : (first + stripSize - 1);
 
-  /* sum values in my strip */
+  int max_found = matrix[first][0];
+  int min_found = matrix[first][0];
+  int max_col_found = 0;
+  int max_row_found = first;
+  int min_col_found = 0;
+  int min_row_found = first;
+
+
+  /* sum values in my strip */ 
+  // Changing worker function so in addition to sum find max and min in each strip as well
   total = 0;
-  for (i = first; i <= last; i++)
-    for (j = 0; j < size; j++)
-      total += matrix[i][j];
+  for (i = first; i <= last; i++){
+    for (j = 0; j < size; j++) {
+      total += matrix[i][j];     
+      if(matrix[i][j] > max_found){
+        max_found = matrix[i][j];
+        max_col_found = j;
+        max_row_found = i;
+      }
+      if(matrix[i][j] < min_found){
+        min_found = matrix[i][j];
+        min_col_found = j;
+        min_row_found = i;  
+      }
+    }
+  }
   sums[myid] = total;
+  max_val[myid] = max_found;
+  max_val_col[myid] = max_col_found;
+  max_val_row[myid] = max_row_found;
+  min_val[myid] = min_found;
+  min_val_col[myid] = min_col_found;
+  min_val_row[myid] = min_row_found;
+
   Barrier();
+
+  // Last worker computes sums, max and min
   if (myid == 0) {
     total = 0;
-    for (i = 0; i < numWorkers; i++)
-      total += sums[i];
+    for (i = 0; i < numWorkers; i++){
+        total += sums[i];
+    }
+    max_found = max_val[0];
+    max_row_found = max_val_row[0];
+    max_col_found = max_val_col[0];
+    min_found = min_val[0];
+    min_row_found = min_val_row[0];
+    min_col_found = min_val_col[0];
+    for(i = 1; i < numWorkers; i++){
+        if(max_val[i] > max_found){
+            max_found = max_val[i];
+            max_col_found = max_val_col[i];
+            max_row_found = max_val_row[i];
+        }
+        if(min_val[i] < min_found){
+            min_found = min_val[i];
+            min_col_found = min_val_col[i];
+            min_row_found = min_val_row[i];
+        }
+      }
+    
     /* get end time */
     end_time = read_timer();
     /* print results */
     printf("The total is %d\n", total);
     printf("The execution time is %g sec\n", end_time - start_time);
+    printf("The maximum value is %d at position [%d, %d]\n", max_found, max_row_found, max_col_found);
+    printf("The minimum value is %d at position [%d, %d]\n", min_found, min_row_found, min_col_found);
   }
 }
