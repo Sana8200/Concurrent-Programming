@@ -88,8 +88,8 @@ int main(int argc, char *argv[]) {
   pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
 
   /* initialize mutex and condition variable */
-  pthread_mutex_init(&barrier, NULL);
-  pthread_cond_init(&go, NULL);
+  //pthread_mutex_init(&barrier, NULL);
+  //pthread_cond_init(&go, NULL);
   /* initilaizing mutex locks for sum, min, max */
   pthread_mutex_init(&sum_lock, NULL);
   pthread_mutex_init(&min_lock, NULL);
