@@ -32,7 +32,7 @@ void Barrier() {
   numArrived++;    // increment the number of arrived workers
   if (numArrived == numWorkers) {    // all workers have arrived
     numArrived = 0;    // reset the counter
-    pthread_cond_broadcast(&go);    // wake up all waiting workers
+    pthread_cond_broadcast(&go);    // broadcast will wake up all waiting workers
   } else
     pthread_cond_wait(&go, &barrier);    // wait for the barrier
   pthread_mutex_unlock(&barrier);  // release the barrier lock
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
   /* initialize the matrix */
   for (i = 0; i < size; i++) {
 	  for (j = 0; j < size; j++) {
-          matrix[i][j] = rand() % 5;  
+          matrix[i][j] = rand() % 1000;  
 	  }
   }
 
@@ -197,4 +197,6 @@ void *Worker(void *arg) {
     printf("The maximum value is %d at position [%d, %d]\n", max_found, max_row_found, max_col_found);
     printf("The minimum value is %d at position [%d, %d]\n", min_found, min_row_found, min_col_found);
   }
-}
+
+  return NULL;
+} 

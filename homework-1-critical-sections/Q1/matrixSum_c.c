@@ -1,9 +1,5 @@
 /* matrix summation using pthreads
 
-   features: uses a barrier; the Worker[0] computes
-             the total sum from partial sums computed by Workers
-             and prints the total sum to the standard output
-
    usage under Linux:
      gcc matrixSum.c -lpthread
      a.out size numWorkers
@@ -30,10 +26,7 @@ pthread_mutex_t max_lock;
 pthread_mutex_t min_lock;
 pthread_mutex_t sum_lock;
 
-pthread_mutex_t barrier;  /* mutex lock for the barrier */
-pthread_cond_t go;        /* condition variable for leaving */
 int numWorkers;           /* number of workers */ 
-int numArrived = 0;       /* number who have arrived */
 
 #ifdef USE_BARRIER
 /* a reusable counter barrier */
@@ -64,8 +57,7 @@ double read_timer() {
 }
 
 double start_time, end_time; /* start and end times */
-int size, stripSize;  /* assume size is multiple of numWorkers */
-//int sums[MAXWORKERS]; /* partial sums */
+int size;  /* assume size is multiple of numWorkers */
 int matrix[MAXSIZE][MAXSIZE]; /* matrix */
 
 int total_sum = 0;      // All workers add here 
@@ -90,9 +82,6 @@ int main(int argc, char *argv[]) {
   pthread_attr_init(&attr);
   pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
 
-  /* initialize mutex and condition variable */
-  //pthread_mutex_init(&barrier, NULL);
-  //pthread_cond_init(&go, NULL);
   /* initilaizing mutex locks for sum, min, max */
   pthread_mutex_init(&sum_lock, NULL);
   pthread_mutex_init(&min_lock, NULL);
@@ -101,7 +90,7 @@ int main(int argc, char *argv[]) {
   pthread_mutex_init(&nextRow_lock, NULL);
 
   /* read command line args if any */
-  size = (argc > 1)? atoi(argv[1]) : MAXSIZE;   // size of the matrix is from command line or default
+  size = (argc > 1)? atoi(argv[1]) : MAXSIZE;  
   numWorkers = (argc > 2)? atoi(argv[2]) : MAXWORKERS;
   if (size > MAXSIZE) size = MAXSIZE;
   if (numWorkers > MAXWORKERS) numWorkers = MAXWORKERS;
@@ -110,7 +99,7 @@ int main(int argc, char *argv[]) {
   /* initialize the matrix */
   for (i = 0; i < size; i++) {
 	  for (j = 0; j < size; j++) {
-          matrix[i][j] = rand() % 5;   
+          matrix[i][j] = rand() % 1000;   
 	  }
   }
 
@@ -127,10 +116,9 @@ int main(int argc, char *argv[]) {
 
   /* do the parallel work: create the workers */
   start_time = read_timer();
-  for (l = 0; l < numWorkers; l++)
+  for (l = 0; l < numWorkers; l++){
     pthread_create(&workerid[l], &attr, Worker, (void *) l);  // creating the workers 
-  //pthread_exit(NULL);  // main thread exits, others continure until finished
-
+  }
   // Since we don't want the main thread to exit before the workers are done,
   // we need to wait for all of them to finish.
   for (l = 0; l < numWorkers; l++){
@@ -153,7 +141,7 @@ int main(int argc, char *argv[]) {
 
 // each worker thread executes this function
 void *Worker(void *arg) {
-  //long myid = (long) arg; 
+  long myid = (long) arg;   // for debug part 
   int i;
 
   int my_total_sum = 0;
@@ -215,8 +203,5 @@ void *Worker(void *arg) {
   }
   pthread_mutex_unlock(&min_lock);
 
-  //Barrier();
-
-  /* No need for barrier and last thread doing the job*/
    return NULL;
 }
