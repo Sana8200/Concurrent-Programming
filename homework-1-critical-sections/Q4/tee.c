@@ -1,7 +1,6 @@
 /* The linux tee command 
    This program uses producer consumer approach
    3 threads (1 producer, 2 consumers) - one shared buffer
-   local buffers - allowing producer to run faster without being blocked by slow consumers 
 */
 
 #include <stdio.h>
@@ -13,7 +12,7 @@
 
 char buffer[BUFFER_SIZE];
 int readersDone[2] = {1, 1};   // array to keep track of eachh consumer if finished reading, 1 = has read, 0 = needs to read
-int done = 0;   // done = 1, producer finished (EOF) 
+int done = 0;    // done = 1, producer finished (EOF) 
 char *filename;  
 
 pthread_mutex_t lock;         // one lock for everything 
