@@ -22,6 +22,9 @@
 #define MAXSIZE 10000  /* maximum matrix size */
 #define MAXWORKERS 10   /* maximum number of workers */
 
+int nextRow = 0;    // next row to be taken and processed
+pthread_mutex_t nextRow_lock;       // mutex lock for nextRow
+
 // mutex locks for min, max, sum (global shared variables)
 pthread_mutex_t max_lock;
 pthread_mutex_t min_lock;
@@ -95,12 +98,14 @@ int main(int argc, char *argv[]) {
   pthread_mutex_init(&min_lock, NULL);
   pthread_mutex_init(&max_lock, NULL);
 
+  pthread_mutex_init(&nextRow_lock, NULL);
+
   /* read command line args if any */
   size = (argc > 1)? atoi(argv[1]) : MAXSIZE;   // size of the matrix is from command line or default
   numWorkers = (argc > 2)? atoi(argv[2]) : MAXWORKERS;
   if (size > MAXSIZE) size = MAXSIZE;
   if (numWorkers > MAXWORKERS) numWorkers = MAXWORKERS;
-  stripSize = size/numWorkers;  // strip of rows divided among workers equally
+  //stripSize = size/numWorkers;  
 
   /* initialize the matrix */
   for (i = 0; i < size; i++) {
@@ -148,58 +153,65 @@ int main(int argc, char *argv[]) {
 
 // each worker thread executes this function
 void *Worker(void *arg) {
-  long myid = (long) arg;  // getting my thread id - using long because in pthread we cast id to void, now cast back to long
-  int total, i, j, first, last;
+  //long myid = (long) arg; 
+  int i;
+
+  int my_total_sum = 0;
+  int my_max = INT_MIN;     // any possible value bigger than this
+  int my_min = INT_MAX;
+  int my_max_row, my_max_col, my_min_row, my_min_col;
+  int row;
 
 #ifdef DEBUG
   printf("worker %d (pthread id %d) has started\n", myid, pthread_self());
 #endif
 
   /* determine first and last rows of my strip */
-  first = myid*stripSize;
-  last = (myid == numWorkers - 1) ? (size - 1) : (first + stripSize - 1);
+  //first = myid*stripSize;
+  //last = (myid == numWorkers - 1) ? (size - 1) : (first + stripSize - 1);
 
-  int max_found = matrix[first][0];
-  int min_found = matrix[first][0];
-  int max_col_found = 0;
-  int max_row_found = first;
-  int min_col_found = 0;
-  int min_row_found = first;
+  while(1){
+    pthread_mutex_lock(&nextRow_lock);
+    if(nextRow >= size){     // checking if there are no more rows
+      pthread_mutex_unlock(&nextRow_lock);
+      break;
+    }else{
+      row = nextRow;
+      nextRow++;
+      pthread_mutex_unlock(&nextRow_lock); 
+    }
 
-
-  /* sum values in my strip */ 
-  // Changing worker function so in addition to sum find max and min in each strip as well
-  total = 0;
-  for (i = first; i <= last; i++){
-    for (j = 0; j < size; j++) {
-      total += matrix[i][j];     
-      if(matrix[i][j] > max_found){
-        max_found = matrix[i][j];
-        max_col_found = j;
-        max_row_found = i;
+    for(i=0; i < size; i++){
+      my_total_sum += matrix[row][i];
+      if(matrix[row][i] > my_max){
+        my_max = matrix[row][i];
+        my_max_row = row;
+        my_max_col = i;
       }
-      if(matrix[i][j] < min_found){
-        min_found = matrix[i][j];
-        min_col_found = j;
-        min_row_found = i;  
+      if(matrix[row][i] < my_min){
+        my_min = matrix[row][i];
+        my_min_row = row;
+        my_min_col = i;
       }
     }
   }
+
+  
   pthread_mutex_lock(&sum_lock);
-  total_sum += total;
+  total_sum += my_total_sum;
   pthread_mutex_unlock(&sum_lock);
   pthread_mutex_lock(&max_lock);
-  if(max_found > max){
-    max = max_found;
-    max_col = max_col_found;
-    max_row = max_row_found;
+  if(my_max > max){
+    max = my_max;
+    max_col = my_max_col;
+    max_row = my_max_row;
   }
   pthread_mutex_unlock(&max_lock);
   pthread_mutex_lock(&min_lock);
-  if(min_found < min){
-    min = min_found;
-    min_col = min_col_found;
-    min_row = min_row_found;
+  if(my_min < min){
+    min = my_min;
+    min_col = my_min_col;
+    min_row = my_min_row;
   }
   pthread_mutex_unlock(&min_lock);
 
