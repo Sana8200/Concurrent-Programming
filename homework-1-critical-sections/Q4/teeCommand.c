@@ -11,9 +11,7 @@
 #define BUFFER_SIZE 1024   
 
 char buffer[BUFFER_SIZE];
-int dataReady = 0;      // 0 no data - 1 new data available 
-// readers finished counts the number of consumers which are done, starts at 2, because in the first iteration, the producer will wait forever if it's 0
-int readersFinished = 2;    
+int readersFinished[2] = {1, 1}; // array to keep track of eachh consumer if finished reading, 1 = has read, 0 = needs to read
 int done = 0;                // done = 1, producer finished (EOF) 
 
 pthread_mutex_t lock;       // mutex lock - one lock for everything 
@@ -36,6 +34,7 @@ int main(int argc, char *argv[]){
    pthread_mutex_init(&lock, NULL);
    pthread_cond_init(&dataAvailable, NULL);
    pthread_cond_init(&readDone, NULL);
+   //printf("writing to file: %s\n", argv[1]);
 
    // Creating the thread (producer, attribute, function, argument)
    pthread_t producer, consumerOut, consumerFile;
@@ -64,23 +63,29 @@ int main(int argc, char *argv[]){
    when reached EOF, sets done = 1, and wake consumers so they can exit
 */
 void *Producer(void *arg){
-   while(fgets(buffer, BUFFER_SIZE, stdin) != NULL){    // fgets reads a line from stdin
+   char readerBuffer[BUFFER_SIZE];
+
+   while(fgets(readerBuffer, BUFFER_SIZE, stdin) != NULL){    // fgets reads a line from stdin
       pthread_mutex_lock(&lock);
       // waiting for both consumers to finish reading the prevous data( when finsihed -> readersFinished = 2)
-      while(readersFinished < 2){     
-         pthread_cond_wait(&readDone, &lock);    // so if readers are not done, the producer waits on cd all reads done and the mutex lock
-      } // here after while both consumers are done with prevous data, so producer moves to processing new data and signaling consumers 
-      readersFinished= 0;      // resets to 0, when readers finished once
-      dataReady = 1;      // Signals that new data is available 
+      // Wait for BOTH consumers to finish reading previous data
+      while(!(readersFinished[0] && readersFinished[1])){     
+         pthread_cond_wait(&readDone, &lock);
+      }
+
+      strcpy(buffer, readerBuffer);   // copy the read data into the shared buffer
+
+      // Reset flags - both consumers need to read new data
+      readersFinished[0] = 0;
+      readersFinished[1] = 0;
 
       pthread_cond_broadcast(&dataAvailable);      // tells all consumers that data is reads (wake them up)
-
       pthread_mutex_unlock(&lock);
    }
 
    // EOF - end of file, then producer needs to stop and signal consumers to exit, it's done
    pthread_mutex_lock(&lock);
-   while(readersFinished < 2){    // waiting for the consumers to completely finished 
+   while(!(readersFinished[0] && readersFinished[1])){    // waiting for the consumers to completely finished 
       pthread_cond_wait(&readDone, &lock);
    }
 
@@ -103,10 +108,10 @@ void *ConsumerOutput(void *arg){
       pthread_mutex_lock(&lock);
 
       //waiting for new data from producer
-      while(!dataReady && !done){     // while data Read = 0, done = 0 
+      while(readersFinished[0] && !done){     // while data Read = 0, done = 0 
          pthread_cond_wait(&dataAvailable, &lock);    
       }
-      if(done && !dataReady){       // it's for when done = 1, so we reached EOF
+      if(readersFinished[0] && done){       // it's for when done = 1, so we reached EOF
          pthread_mutex_unlock(&lock);
          break;
       }
@@ -114,11 +119,10 @@ void *ConsumerOutput(void *arg){
       // Now Consumer 2 starts processing, copying data into local buffer 
       strcpy(localBufferOutput, buffer);     
       
-      readersFinished++;      // finished taking the data, now increment the counter
+      readersFinished[0] = 1;      
 
       // both consumers done, signaling producer (using signal becasue it's just one thread waiting), and reset data Ready
-      if(readersFinished == 2){
-         dataReady = 0;
+      if(readersFinished[0] && readersFinished[1]){
          pthread_cond_signal(&readDone);
       }
       pthread_mutex_unlock(&lock);
@@ -140,28 +144,26 @@ void *ConsumerFile(void *arg){
       printf("couldn't open the file");
       return NULL;    
    }
-
+  
    while(1){
       pthread_mutex_lock(&lock);
 
-      while(!dataReady && !done){
+      while(readersFinished[1] && !done){
          pthread_cond_wait(&dataAvailable, &lock);
       }
-      if(done && !dataReady){
+      if(readersFinished[1] && done){
          pthread_mutex_unlock(&lock);
          break;
       }
 
       strcpy(localBufferFile, buffer);
-      readersFinished++;
+      readersFinished[1] = 1;        // finished taking the data, now increment the counter
 
-      if(readersFinished == 2){
-         dataReady = 0;
+      if(readersFinished[0] && readersFinished[1]){
          pthread_cond_signal(&readDone);
       }
       pthread_mutex_unlock(&lock);
       fprintf(fptr, "%s", localBufferFile);
-
    }
    fclose(fptr);
    return NULL;
