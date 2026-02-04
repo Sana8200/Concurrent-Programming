@@ -19,7 +19,7 @@ double start_time, end_time;
 int numWorkers;
 int size; 
 int matrix[MAXSIZE][MAXSIZE];
-void *Worker(void *);
+
 
 /* read command line, initialize, and create threads */
 int main(int argc, char *argv[]) {
@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 
   int max = INT_MIN;     // Start with smallest possible
   int min = INT_MAX;     // Start with largest possible  
-  int max_row, max_col, min_row, min_col;
+   int max_row = 0, max_col = 0, min_row = 0, min_col = 0;
 
 
   /* read command line args if any */
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   for (i = 0; i < size; i++) {
     //  printf("[ ");
 	  for (j = 0; j < size; j++) {
-      matrix[i][j] = rand()%99;
+      matrix[i][j] = rand()% 1000;
       //	  printf(" %d", matrix[i][j]);
 	  }
 	  //	  printf(" ]\n");
@@ -88,4 +88,6 @@ int main(int argc, char *argv[]) {
   printf("it took %g seconds\n", end_time - start_time);
   printf("the max is %d at position [%d, %d]\n", max, max_row, max_col);
   printf("the min is %d at position [%d, %d]\n", min, min_row, min_col);
+
+  return 0;
 }
