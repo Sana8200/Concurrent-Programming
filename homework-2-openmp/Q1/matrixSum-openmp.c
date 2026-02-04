@@ -27,8 +27,8 @@ int main(int argc, char *argv[]) {
 
   int max = INT_MIN;     // Start with smallest possible
   int min = INT_MAX;     // Start with largest possible  
-  int max_row, max_col;
-  int min_row, min_col;
+  int max_row, max_col, min_row, min_col;
+
 
   /* read command line args if any */
   size = (argc > 1)? atoi(argv[1]) : MAXSIZE;
@@ -52,42 +52,35 @@ int main(int argc, char *argv[]) {
   start_time = omp_get_wtime();
   
   // parallel computing of sum, max, min, each thread works on a subset of rows 
-  #pragma omp parallel for reduction(+:total) reduction(max:max) reduction(min:min) private(j)
+#pragma omp parallel for reduction(+:total) private(j)
   for (i = 0; i < size; i++)
     for (j = 0; j < size; j++){
       total += matrix[i][j];
-      if(matrix[i][j] > max){
-        max = matrix[i][j];
-      }
-      if(matrix[i][j] < min){
-        min = matrix[i][j];
-      } 
-    }
 
-  // find the position of max and min, openmp reductions just find values, not the positions
-  #pragma omp parallel for private(j)
-  for(i = 0; i < size; i++){
-    for(j = 0; j < size; j++){
-      if(matrix[i][j] == max){
-        // critical sections used, because multiple threads may find the smae max/min at the same time
-        #pragma omp critical
-        {
-          max_row = i;
-          max_col = j;
-        }
-      }
-      if(matrix[i][j] == min){
-        #pragma omp critical
-        {
-          min_row = i;
-          min_col = j;
-        }
-      }
-    }
-  }
+      // entering critical section if found a max and min (using double check)
+      if (max < matrix[i][j]) {
+#pragma omp critical        
+				{
+					if (max < matrix[i][j]) {
+						max = matrix[i][j];
+						max_row = i;
+						max_col = j;
+					}
+				}
+			}
 
+			if (min > matrix[i][j]) {
+#pragma omp critical
+				{
+					if (min > matrix[i][j]) {
+						min = matrix[i][j];
+						min_row = i;
+						min_col = j;
+					}
+				}
+			}
+		}
   // implicit barrier, automatic 
-
 
   end_time = omp_get_wtime();      // only runs after all parallel work is done 
  
@@ -95,6 +88,4 @@ int main(int argc, char *argv[]) {
   printf("it took %g seconds\n", end_time - start_time);
   printf("the max is %d at position [%d, %d]\n", max, max_row, max_col);
   printf("the min is %d at position [%d, %d]\n", min, min_row, min_col);
-
 }
-
