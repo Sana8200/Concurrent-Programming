@@ -1,28 +1,28 @@
-# Homework 2: Programming with OpenMP
+## Homework 2: Programming with OpenMP
 
 Shared-memory parallel programming using OpenMP.
 
-## Problems Solved
+### Problems Solved
 
 | File | Description |
 |------|-------------|
 | `matrixSum-openmp.c` | Matrix sum/min/max using `parallel for` with reduction |
 | `quickSort_openmp.c` | Parallel quicksort using `task` directives |
 
-## Compilation
+### Compilation
 
 ```bash
 gcc -O -fopenmp -o program program.c
 ```
 
-## Usage
+### Usage
 
 ```bash
 ./matrixSum-openmp 5000 4       # 5000×5000 matrix, 4 threads
 ./quickSort_openmp 1000000 4   # 1M elements, 4 threads
 ```
 
-## Approaches
+### Approaches
 
 **Q1 (Matrix Sum/Min/Max):**  
 - `reduction(+:total)` for thread-safe summation  
