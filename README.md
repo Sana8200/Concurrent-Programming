@@ -1,11 +1,11 @@
-# Concurrent Programming Assignments
+## Concurrent Programming Assignments
 
 This repository contains solutions to a series of assignments for a course on **Concurrent and Distributed Programming**.
 
 The course focuses on the foundations, principles, and practical techniques of concurrent, parallel, and distributed systems. The assignments provide hands-on experience with synchronization mechanisms, multithreading, shared-memory parallelism, and message-passing systems.
 
 
-## Course Topics
+### Course Topics
 
 - Concurrent programming concepts, models, and paradigms
 - Processes and threads
@@ -17,7 +17,7 @@ The course focuses on the foundations, principles, and practical techniques of c
 - Distributed programming and message passing (MPI)
 
 
-## Assignments Overview
+### Assignments Overview
 
 | Homework | Topic |
 |--------|------|
@@ -31,7 +31,7 @@ Each assignment is located in its own directory and includes source code and a b
 
 
 
-## Technologies
+### Technologies
 
 - **Languages:** C, Java
 - **Libraries:** pthreads, OpenMP, Java Concurrency, MPI
@@ -39,7 +39,7 @@ Each assignment is located in its own directory and includes source code and a b
 
 
 
-## Learning Objectives
+### Learning Objectives
 
 Through these assignments, the goal is to:
 
@@ -51,7 +51,7 @@ Through these assignments, the goal is to:
 
 
 
-## 📌 Notes
+#### 📌 Notes
 
 These assignments are part of an university course and are intended for educational purposes.
 
