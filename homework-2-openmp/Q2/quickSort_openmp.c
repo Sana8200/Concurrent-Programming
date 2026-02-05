@@ -54,7 +54,6 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-
 int partition(int arr[], int left, int right){
     int pivot = arr[right];      // choosing last element as pivot
     int i = left;          // index for smaller elements 
@@ -74,7 +73,6 @@ int partition(int arr[], int left, int right){
 
     return i;      // return's pivot's position
 }
-
 
 void quickSort(int arr[], int left, int right) {
     if (left < right) {
