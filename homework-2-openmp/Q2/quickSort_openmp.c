@@ -34,9 +34,10 @@ int main(int argc, char *argv[]) {
 
     start_time = omp_get_wtime();
     
-    #pragma omp parallel
+    // parallel region
+    #pragma omp parallel 
     {
-        #pragma omp single
+        #pragma omp single   // only one thread starts the initial quickSort, the rest takes tasks
         {
             quickSort(arr, 0, size - 1);
         }
@@ -79,14 +80,15 @@ void quickSort(int arr[], int left, int right) {
     if (left < right) {
         int pivotIndex = partition(arr, left, right);
 
+        // Creating tasks for other threads, only right and left sorting in parallel
         if(right - left >= MINSIZE){
-            #pragma omp task
+            #pragma omp task         // task left
             quickSort(arr, left, pivotIndex - 1);    // Sort left part
         
-            #pragma omp task
+            #pragma omp task         // task right
             quickSort(arr, pivotIndex + 1, right);   // Sort right part
         
-            #pragma omp taskwait   // Wait for both tasks to finish
+            #pragma omp taskwait   // Wait for both tasks to finish, for cleaner, more efficent if we add function after, gaurannted correctnes
         } else {
             quickSort(arr, left, pivotIndex - 1);
             quickSort(arr, pivotIndex + 1, right);

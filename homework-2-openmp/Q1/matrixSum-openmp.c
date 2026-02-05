@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   for (i = 0; i < size; i++) {
     //  printf("[ ");
 	  for (j = 0; j < size; j++) {
-      matrix[i][j] = rand()% 1000;
+      matrix[i][j] = rand() % 99;
       //	  printf(" %d", matrix[i][j]);
 	  }
 	  //	  printf(" ]\n");
@@ -53,13 +53,13 @@ int main(int argc, char *argv[]) {
   
   // parallel computing of sum, max, min, each thread works on a subset of rows 
 #pragma omp parallel for reduction(+:total) private(j)
-  for (i = 0; i < size; i++)
+  for (i = 0; i < size; i++)  
     for (j = 0; j < size; j++){
       total += matrix[i][j];
 
       // entering critical section if found a max and min (using double check)
       if (max < matrix[i][j]) {
-#pragma omp critical        
+#pragma omp critical(find_max)      
 				{
 					if (max < matrix[i][j]) {
 						max = matrix[i][j];
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 			}
 
 			if (min > matrix[i][j]) {
-#pragma omp critical
+#pragma omp critical(find_min)
 				{
 					if (min > matrix[i][j]) {
 						min = matrix[i][j];
