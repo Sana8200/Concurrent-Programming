@@ -4,7 +4,6 @@ This repository contains solutions to a series of assignments for a course on **
 
 The course focuses on the foundations, principles, and practical techniques of concurrent, parallel, and distributed systems. The assignments provide hands-on experience with synchronization mechanisms, multithreading, shared-memory parallelism, and message-passing systems.
 
----
 
 ## Course Topics
 
@@ -17,7 +16,6 @@ The course focuses on the foundations, principles, and practical techniques of c
 - Shared-memory parallelism (OpenMP)
 - Distributed programming and message passing (MPI)
 
----
 
 ## Assignments Overview
 
@@ -31,7 +29,7 @@ The course focuses on the foundations, principles, and practical techniques of c
 
 Each assignment is located in its own directory and includes source code and a brief explanation of the solution approach.
 
----
+
 
 ## Technologies
 
@@ -39,7 +37,7 @@ Each assignment is located in its own directory and includes source code and a b
 - **Libraries:** pthreads, OpenMP, Java Concurrency, MPI
 - **Concepts:** Mutexes, Condition Variables, Barriers, Semaphores, Monitors
 
----
+
 
 ## Learning Objectives
 
@@ -51,9 +49,9 @@ Through these assignments, the goal is to:
 - Build distributed applications using message passing
 - Evaluate performance and scalability of concurrent applications
 
----
+
 
 ## 📌 Notes
 
-These assignments are part of an academic course and are intended for educational purposes.
+These assignments are part of an university course and are intended for educational purposes.
 
