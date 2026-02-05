@@ -1,6 +1,6 @@
 # Concurrent Programming Assignments
 
-This repository contains solutions to a series of assignments for a university-level course on **Concurrent and Distributed Programming**.
+This repository contains solutions to a series of assignments for a course on **Concurrent and Distributed Programming**.
 
 The course focuses on the foundations, principles, and practical techniques of concurrent, parallel, and distributed systems. The assignments provide hands-on experience with synchronization mechanisms, multithreading, shared-memory parallelism, and message-passing systems.
 
@@ -14,11 +14,8 @@ The course focuses on the foundations, principles, and practical techniques of c
 - Critical sections, locks, barriers, and condition variables
 - Semaphores and monitors
 - Concurrent objects (locking, lock-free, wait-free)
-- Multicore architectures and performance models
-- Shared-memory parallelism
-- Distributed programming and message passing
-- RPC, RMI, sockets, and MPI
-- Introduction to parallelism in scientific computing
+- Shared-memory parallelism (OpenMP)
+- Distributed programming and message passing (MPI)
 
 ---
 
@@ -36,17 +33,11 @@ Each assignment is located in its own directory and includes source code and a b
 
 ---
 
-## Technologies & Tools
+## Technologies
 
-Depending on the assignment, the following tools and environments will be used:
-
-- C / Java
-- pthreads
-- OpenMP
-- Java Threads and Concurrent Utilities
-- Semaphores and Monitors
-- MPI
-- Java Sockets and RMI
+- **Languages:** C, Java
+- **Libraries:** pthreads, OpenMP, Java Concurrency, MPI
+- **Concepts:** Mutexes, Condition Variables, Barriers, Semaphores, Monitors
 
 ---
 
