@@ -1,8 +1,8 @@
-# Homework 1: Critical Sections, Locks, Barriers, and Condition Variables
+## Homework 1: Critical Sections, Locks, Barriers, and Condition Variables
 
 Concurrent programming fundamentals using POSIX threads (pthreads).
 
-## Problems Solved
+### Problems Solved
 
 | File | Description |
 |------|-------------|
@@ -12,13 +12,13 @@ Concurrent programming fundamentals using POSIX threads (pthreads).
 | `pi.c` | Compute π using **adaptive quadrature** with parallel intervals |
 | `tee.c` | Linux `tee` command — **producer-consumer** with 3 threads |
 
-## Compilation
+### Compilation
 
 ```bash
 gcc -o program program.c -lpthread -lm
 ```
 
-## Usage
+### Usage
 
 ```bash
 ./matrixSum_a 1000 4      # 1000×1000 matrix, 4 workers
@@ -26,7 +26,7 @@ gcc -o program program.c -lpthread -lm
 echo "hello" | ./tee out.txt
 ```
 
-## Approaches
+### Approaches
 
 **Q1a (Barrier):** Each worker computes partial sum/min/max for its strip. After barrier, Worker[0] combines results.
 
