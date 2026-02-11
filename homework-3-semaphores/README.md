@@ -1,1 +1,9 @@
 Homework 3: Use of Semaphores
+
+1. The Hungry Birds Problem  (one producer - multiple consumers) (20 points)
+Given are n baby birds and one parent bird. The baby birds eat out of a common dish that initially contains W worms. Each baby bird repeatedly takes a worm, eats it, sleeps for a while, takes another worm, and so on. When the dish is empty, the baby bird, who discovers the empty dish, chirps loudly to awaken the parent bird. The parent bird flies off, gathers W more worms, puts them in the dish, and then waits for the dish to be empty again. This pattern repeats forever.
+Develop and implement a multithreaded program to simulate the actions of the birds. Represent the birds as concurrent threads (i.e., an array of "babyBird" threads and a "parentBird" thread) and the dish as a critical shared resource that can be accessed by at most one bird at a time. Use only semaphores for synchronization. Your program should print a trace of interesting simulation events. Is your solution fair? Explain when presenting homework.
+
+2. The Bear and Honeybees Problem (multiple producers - one consumer) (20 points)
+Given are n honeybees and a hungry bear. They share a pot of honey. The pot is initially empty; its capacity is H portions of honey. The bear sleeps until the pot is full, eats all the honey, and goes back to sleep. Each bee repeatedly gathers one portion of honey and puts it in the pot; the bee who fills the pot awakens the bear.
+Develop and implement a multithreaded program to simulate the actions of the bear and honeybees. Represent the bear and honeybees as concurrent threads (i.e., a "bear" thread and an array of "honeybee" threads) and the pot as a critical shared resource that can be accessed by at most one thread at a time. Use only semaphores for synchronization. Your program should print a trace of interesting simulation events. Is your solution fair (w.r.t. honeybees)? Explain when presenting homework.

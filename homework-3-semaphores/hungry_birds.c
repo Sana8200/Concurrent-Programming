@@ -66,7 +66,7 @@ int main(int argc, char *argv[]){
     return 0; 
 }
 
-
+/* One Producer (Parent Bird)*/
 void *ParentBird(void *arg){
     printf("Parent Bird provided %d worms in the common dish for %d baby birds.\n", W, numbBabyBirds);
     while(1){
@@ -78,7 +78,7 @@ void *ParentBird(void *arg){
 }
 
 
-// Multiple Consumers (Baby Birds)
+/* Multiple Consumers (Baby Birds)*/
 void *BabyBirds(void *arg){
     int id = (int)(long)arg;
     int next = (id + 1) % numbBabyBirds;  // Next bird in circle
