@@ -22,7 +22,7 @@ sem_t turn[MAXBABYBIRDS];  // Array for round-robin ordering
 
 int worms;          // current worms in dish
 int W;              // dish maximum size (capacity of dish)
-int numbBabyBirds;
+int numBabyBirds;
 
 void *ParentBird(void *arg);
 void *BabyBirds(void *arg);
@@ -36,9 +36,9 @@ int main(int argc, char *argv[]){
 
     /* read command line args if any */
     W = (argc > 1)? atoi(argv[1]) : MAXWORMS;
-    numbBabyBirds = (argc > 2)? atoi(argv[2]): MAXBABYBIRDS;
+    numBabyBirds = (argc > 2)? atoi(argv[2]): MAXBABYBIRDS;
     /* safey checck */
-    if(numbBabyBirds > MAXBABYBIRDS) numbBabyBirds = MAXBABYBIRDS;
+    if(numBabyBirds > MAXBABYBIRDS) numBabyBirds = MAXBABYBIRDS;
     if( W > MAXWORMS) W = MAXWORMS;
 
     worms = W;     // dish starts full
@@ -47,19 +47,19 @@ int main(int argc, char *argv[]){
     sem_init(&empty, 0, 0);    // signaling, init 0 (signaling, coordinator semaphore)
     sem_init(&full, 0, 0);     // signaling, init 0 
     // Initialize turns: Bird 0 goes first, others wait
-    for (int i = 0; i < numbBabyBirds; i++) {
+    for (int i = 0; i < numBabyBirds; i++) {
         sem_init(&turn[i], 0, (i == 0) ? 1 : 0);
     }
 
     // Creating threads (parentbird 1 thread, baby birds N threads)
     pthread_create(&parentBird, NULL, ParentBird, NULL);    
-    printf("There are %d Baby Birds eating and sleeping\n", numbBabyBirds);  
-    for(int i = 0; i < numbBabyBirds; i ++){
+    printf("There are %d Baby Birds eating and sleeping\n", numBabyBirds);  
+    for(int i = 0; i < numBabyBirds; i ++){
         pthread_create(&babyBirds[i], NULL, BabyBirds, (void *)(long) i);
     }
 
     // Wait for threads(in this case threads can run forever, but we can have it anyway)
-    for(int i = 0; i < numbBabyBirds; i++){
+    for(int i = 0; i < numBabyBirds; i++){
         pthread_join(babyBirds[i], NULL);
     }
 
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]){
 
 /* One Producer (Parent Bird)*/
 void *ParentBird(void *arg){
-    printf("Parent Bird provided %d worms in the common dish for %d baby birds.\n", W, numbBabyBirds);
+    printf("Parent Bird provided %d worms in the common dish for %d baby birds.\n", W, numBabyBirds);
     while(1){
         sem_wait(&empty);       // Block until dish is empty 
         worms = W;              // refill 
@@ -81,7 +81,7 @@ void *ParentBird(void *arg){
 /* Multiple Consumers (Baby Birds)*/
 void *BabyBirds(void *arg){
     int id = (int)(long)arg;
-    int next = (id + 1) % numbBabyBirds;  // Next bird in circle
+    int next = (id + 1) % numBabyBirds;  // Next bird in circle
     while(1){
         sem_wait(&turn[id]);      // wait for my turn 
         sem_wait(&dish);          // enter CS
