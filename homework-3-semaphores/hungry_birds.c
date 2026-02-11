@@ -12,8 +12,8 @@
 #include <semaphore.h>
 #include <unistd.h>    // for sleep()
 
-#define MAXWORMS 20
-#define MAXBABYBIRDS 30    
+#define MAXWORMS 40
+#define MAXBABYBIRDS 30   
 
 sem_t dish;                // Mutex for common dish access
 sem_t empty;               // signal: dish is empty
@@ -76,7 +76,6 @@ void *ParentBird(void *arg){
         sem_post(&full);       // signal waiting baby bird
     }
 }
-
 
 /* Multiple Consumers (Baby Birds)*/
 void *BabyBirds(void *arg){

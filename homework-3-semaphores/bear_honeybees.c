@@ -12,8 +12,8 @@
 #include <semaphore.h>
 #include <unistd.h>
 
-#define MAXPORTIONS 20
-#define MAXHONEYBEES 30    
+#define MAXPORTIONS 45
+#define MAXHONEYBEES 20    
 
 sem_t pot;                 // Mutex for common pot access
 sem_t full;                // signal: pot is full, wake bear
@@ -85,7 +85,6 @@ void *HoneyBees(void *arg){
         sleep(rand() % 3 + 1);
     }
 }
-
 
 /* One Consumer (the bear) */
 void *Bear(void *arg){
