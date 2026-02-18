@@ -18,7 +18,7 @@
 sem_t dish;                // Mutex for common dish access
 sem_t empty;               // signal: dish is empty
 sem_t full;                // signal: dish is refilled
-sem_t turn[MAXBABYBIRDS];  // Array for round-robin ordering
+//sem_t turn[MAXBABYBIRDS];  // Array for round-robin ordering
 
 int worms;          // current worms in dish
 int W;              // dish maximum size (capacity of dish)
@@ -47,9 +47,11 @@ int main(int argc, char *argv[]){
     sem_init(&empty, 0, 0);    // signaling, init 0 (signaling, coordinator semaphore)
     sem_init(&full, 0, 0);     // signaling, init 0 
     // Initialize turns: Bird 0 goes first, others wait
+    /*
     for (int i = 0; i < numBabyBirds; i++) {
         sem_init(&turn[i], 0, (i == 0) ? 1 : 0);
     }
+    */
 
     // Creating threads (parentbird 1 thread, baby birds N threads)
     pthread_create(&parentBird, NULL, ParentBird, NULL);    
@@ -80,9 +82,9 @@ void *ParentBird(void *arg){
 /* Multiple Consumers (Baby Birds)*/
 void *BabyBirds(void *arg){
     int id = (int)(long)arg;
-    int next = (id + 1) % numBabyBirds;  // Next bird in circle
+    //int next = (id + 1) % numBabyBirds;  // Next bird in circle
     while(1){
-        sem_wait(&turn[id]);      // wait for my turn 
+        //sem_wait(&turn[id]);      // wait for my turn 
         sem_wait(&dish);          // enter CS
         if(worms == 0){
             printf("Baby bird %d found the dish empty! Chirping for parent.\n", id);
@@ -92,7 +94,7 @@ void *BabyBirds(void *arg){
         worms--;
         printf("Baby %d ate. Remaining: %d\n", id, worms);
         sem_post(&dish);          // leave critical section, unlock
-        sem_post(&turn[next]);    // signal next bird
+        //sem_post(&turn[next]);    // signal next bird
         sleep(rand() % 3 + 1);    // sleep for random time, +1 so birds are always sleep for at least 1 second
     } 
 }
