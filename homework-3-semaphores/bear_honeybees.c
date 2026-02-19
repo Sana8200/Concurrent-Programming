@@ -18,7 +18,7 @@
 sem_t pot;                 // Mutex for common pot access
 sem_t full;                // signal: pot is full, wake bear
 sem_t empty;               // signal: bear finished eating, pot is empty
-sem_t turn[MAXHONEYBEES];  // Array for round-robin ordering
+//sem_t turn[MAXHONEYBEES];  // Array for round-robin ordering
 
 int honeyPortions;         // current honey portions in the pot
 int H;                     // capacity of the pot
@@ -46,10 +46,12 @@ int main(int argc, char *argv[]){
     sem_init(&pot, 0, 1);      // mutex, init 1 (binary semaphore)
     sem_init(&full, 0, 0);     // signaling, init 0
     sem_init(&empty, 0, 0);    // signaling, init 0
+    /*
     // Initialize turns: Bee 0 goes first, others wait
     for (int i = 0; i < numHoneyBees; i++) {
         sem_init(&turn[i], 0, (i == 0) ? 1 : 0);
     }
+        */
 
 
     // Creating threads (bear 1 thread, Honeybees N threads)
@@ -69,9 +71,9 @@ int main(int argc, char *argv[]){
 /* Multiple Procuders (Honeybees)*/
 void *HoneyBees(void *arg){
     int id = (int)(long) arg;
-    int next = (id + 1) % numHoneyBees;    // Next honey bee in the circle
+    //int next = (id + 1) % numHoneyBees;    // Next honey bee in the circle
     while(1){
-        sem_wait(&turn[id]);       // wait for my turn
+        //sem_wait(&turn[id]);       // wait for my turn
         sem_wait(&pot);            // enter CS
         honeyPortions++;
         printf("Bee %d added honey to the pot. Portions: %d/%d\n", id, honeyPortions, H);
@@ -81,7 +83,7 @@ void *HoneyBees(void *arg){
             sem_wait(&empty);      // wait for bear to finish eating
         }
         sem_post(&pot);            // leave CS
-        sem_post(&turn[next]);     // signal next bee
+        //sem_post(&turn[next]);     // signal next bee
         sleep(rand() % 3 + 1);
     }
 }
