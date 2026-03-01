@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <mpi.h>
 
+#define REQUEST_TAG 1
+#define RESPONSE_TAG 2
+
 void server(int num_students);
 void client(int my_id);
 
@@ -17,7 +20,7 @@ int main(int argc, char *argv[]){
 
     if(num_students < 1){
         if(rank == 0){
-            printf("At least 2 processes are required (1 server and 1 client (1 teacher + 1 student)).\n");
+            printf("Error: At least 2 processes are required (1 teacher(server) + 1 student(client)).\n");
         }
         MPI_Finalize();
         return 1;
@@ -41,14 +44,14 @@ void server(int num_students){
     printf("Teacher process is running to pair %d students with each other...\n", num_students);
 
     while(req_recived < num_students){
-        MPI_Recv(&student1, 1, MPI_INT, MPI_ANY_SOURCE, 1, MPI_COMM_WORLD, &status);
+        MPI_Recv(&student1, 1, MPI_INT, MPI_ANY_SOURCE, REQUEST_TAG, MPI_COMM_WORLD, &status);
         req_recived++;
         printf("Teacher: Received request from Student %d\n", student1);
 
         // checking if there's another student to pair with
         if(req_recived < num_students){
             // Receive second student's request
-            MPI_Recv(&student2, 1, MPI_INT, MPI_ANY_SOURCE, 1, MPI_COMM_WORLD, &status);
+            MPI_Recv(&student2, 1, MPI_INT, MPI_ANY_SOURCE, REQUEST_TAG, MPI_COMM_WORLD, &status);
             req_recived++;
             printf("Teacher: Received request from Student %d\n", student2);
 
@@ -56,12 +59,12 @@ void server(int num_students){
             printf("Teacher: Pairing Student %d with Student %d\n", student1, student2);
 
             // Send info to both students who they are paired with
-            MPI_Send(&student2, 1, MPI_INT, student1, 2, MPI_COMM_WORLD);
-            MPI_Send(&student1, 1, MPI_INT, student2, 2, MPI_COMM_WORLD);
+            MPI_Send(&student2, 1, MPI_INT, student1, RESPONSE_TAG, MPI_COMM_WORLD);
+            MPI_Send(&student1, 1, MPI_INT, student2, RESPONSE_TAG, MPI_COMM_WORLD);
         } else {
             // for odd number of students, last student works alone, pairs with themselves
             printf("Teacher: Student %d will work alone (odd number)\n", student1);
-            MPI_Send(&student1, 1, MPI_INT, student1, 2, MPI_COMM_WORLD);
+            MPI_Send(&student1, 1, MPI_INT, student1, RESPONSE_TAG, MPI_COMM_WORLD);
         }
     }
     printf("Teacher: All students have been paired!\n");
@@ -74,10 +77,10 @@ void client(int my_id){
 
     // Send pairing request to teacher (process 0)
     printf("Student %d: Sending pairing request to teacher\n", my_id);
-    MPI_Send(&my_id, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
+    MPI_Send(&my_id, 1, MPI_INT, 0, REQUEST_TAG, MPI_COMM_WORLD);
         
     // Wait for partner info from teacher
-    MPI_Recv(&partner, 1, MPI_INT, 0, 2, MPI_COMM_WORLD, &status);
+    MPI_Recv(&partner, 1, MPI_INT, 0, RESPONSE_TAG, MPI_COMM_WORLD, &status);
         
     if (partner == my_id) {
         printf("Student %d: I am working alone (no partner)\n", my_id);

@@ -44,7 +44,7 @@ mpirun --oversubscribe -np 7 ./clientServer   # for not enough slots error
 - MPI_Finalize() - end MPI
 
 
-## Example Output (4 students)
+### Example Output (4 students)
 ```
 Student 2: Sending pairing request to teacher
 Student 3: Sending pairing request to teacher
