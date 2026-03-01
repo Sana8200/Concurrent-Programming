@@ -6,9 +6,10 @@ This is a client-server model where:
 - Processes 1 to n are STUDENTS (clients)
 
 ### Algorithm implemented 
-1. Each student sends a "pairing request" to the teacher (their rank) using MPI_Send()
+1. Each student sends a "pairing request" signal to the teacher using MPI_Send()
 2. The teacher receives requests in pairs (first-come-first-served)(FIFO)
-    - Since the teacher doesn't know which students will send first (parallel execution is non-deterministic), MPI_Recv() is used with MPI_ANY_SOURCE to receive    messages from any students, (accepts requests from any source).
+    - Since the teacher doesn't know which students will send first (parallel execution is non-deterministic), MPI_Recv() is used with MPI_ANY_SOURCE to receive messages from any students
+    - To identify who sent the request, the teacher uses `status.MPI_SOURCE` (Lecture 16, Slide 15)
 3. For each pair of requests, the teacher:
     - Sends the second student's ID to the first student
     - Sends the first student's ID to the second student
@@ -41,6 +42,7 @@ mpirun --oversubscribe -np 7 ./clientServer   # if not enough slots
 - MPI_Comm_size() - get total processes
 - MPI_Send() - send message
 - MPI_Recv() - receive message (waits until message arrives)
+- status.MPI_SOURCE - get the sender's rank when using MPI_ANY_SOURCE 
 - MPI_Finalize() - end MPI
 
 
