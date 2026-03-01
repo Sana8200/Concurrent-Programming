@@ -1,17 +1,17 @@
-# Problem 1: Distributed Pairing - Client-Server Application
+## Problem 1: Distributed Pairing - Client-Server Application
 
 A distributed MPI application where a teacher (server) pairs students (clients) for project work.
 A teacher needs to pair students for a project. The teacher is the server (process 0) and students are clients (processes 1 to n). 
 Students send requests to the teacher, and the teacher pairs them together.
 
-## How the algorithm works
+### How the algorithm works
 
 1. Teacher waits for students to send pairing requests
 2. When teacher gets two requests, it pairs those students together
 3. Teacher tells each student who their partner is
 4. If there's an odd number of students, the last one works alone
 
-## Message passing
+### Message passing
 
 Students send their ID to the teacher using MPI_Send(). The teacher receives these with MPI_Recv() using MPI_ANY_SOURCE because we don't know which student will send first.
 
@@ -22,7 +22,7 @@ Student --> sends request --> Teacher
 Student <-- gets partner  <-- Teacher
 ```
 
-## How to run
+### How to run
 
 Compile:
 ```
@@ -39,7 +39,7 @@ mpirun --oversubscribe -np 7 ./clientServer   # for not enough slots error
 ### It's distributed since..
 The process don't share any memory. They only communicate by sending message to each other using MPI. 
 
-## MPI functions used 
+### MPI functions used 
 - MPI_Init() - start MPI
 - MPI_Comm_rank() - get my process ID
 - MPI_Comm_size() - get total processes
