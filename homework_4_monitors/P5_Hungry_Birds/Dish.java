@@ -48,13 +48,15 @@ public class Dish {
             System.out.println("Parent is gathering worms...");
             try{
                 Thread.sleep(1000);   // gattering time for parent bird 
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); 
+            }
 
             worms = capacity;
             System.out.println("Parent refilled dish with fresh " + capacity + " worms!!!");
             full.signalAll();     // Wake all waiting babies
         } catch(InterruptedException e){
-            Thread.currentThread().interrupt(); // Restore interrupt flag
+            Thread.currentThread().interrupt(); 
         }
         finally {
             lock.unlock();

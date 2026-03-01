@@ -23,7 +23,9 @@ public class HungryBirds {
         for (int i = 0; i < n; i++) {
             try {
                 babies[i].join();
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 }
