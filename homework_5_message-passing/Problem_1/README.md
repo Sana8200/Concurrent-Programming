@@ -68,6 +68,6 @@ Student 2: My partner is Student 3
 Student 1: I am working alone (no partner)
 ```
 
-- **Distributed**: Yes - processes communicate only via message passing, no shared memory
+- **Distributed**: The program is distributed, processes don't share any memory and they only communicate by sending message to each other using MPI.
 - **Non-deterministic**: Pairing order depends on which students' requests arrive first
-- **Handles odd numbers**: Last student works alone if odd number of students
+- **Handles odd numbers**: Last student works alone and pair with themselves if odd number of students
