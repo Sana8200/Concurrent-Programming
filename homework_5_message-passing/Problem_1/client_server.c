@@ -40,20 +40,21 @@ void server(int num_students){
     MPI_Status status;     // declare status for receiving messages
     int student1, student2;
     int req_recived = 0;
+    int request;  // just signal for receveing requests
 
     printf("Teacher process is running to pair %d students with each other...\n", num_students);
 
     while(req_recived < num_students){
-        MPI_Recv(&student1, 1, MPI_INT, MPI_ANY_SOURCE, REQUEST_TAG, MPI_COMM_WORLD, &status);
+        MPI_Recv(&request, 1, MPI_INT, MPI_ANY_SOURCE, REQUEST_TAG, MPI_COMM_WORLD, &status);
+        student1 = status.MPI_SOURCE;  // Get sender's rank from status
         req_recived++;
-        printf("Teacher: Received request from Student %d\n", student1);
 
         // checking if there's another student to pair with
         if(req_recived < num_students){
             // Receive second student's request
-            MPI_Recv(&student2, 1, MPI_INT, MPI_ANY_SOURCE, REQUEST_TAG, MPI_COMM_WORLD, &status);
+            MPI_Recv(&request, 1, MPI_INT, MPI_ANY_SOURCE, REQUEST_TAG, MPI_COMM_WORLD, &status);
+            student2 = status.MPI_SOURCE;
             req_recived++;
-            printf("Teacher: Received request from Student %d\n", student2);
 
             // Pairing 
             printf("Teacher: Pairing Student %d with Student %d\n", student1, student2);
@@ -63,7 +64,6 @@ void server(int num_students){
             MPI_Send(&student1, 1, MPI_INT, student2, RESPONSE_TAG, MPI_COMM_WORLD);
         } else {
             // for odd number of students, last student works alone, pairs with themselves
-            printf("Teacher: Student %d will work alone (odd number)\n", student1);
             MPI_Send(&student1, 1, MPI_INT, student1, RESPONSE_TAG, MPI_COMM_WORLD);
         }
     }
@@ -73,11 +73,12 @@ void server(int num_students){
 
 void client(int my_id){
     MPI_Status status;  // declare status for receiving messages
-    int partner;        
+    int partner;   
+    int request = 1;   // just signal     
 
     // Send pairing request to teacher (process 0)
     printf("Student %d: Sending pairing request to teacher\n", my_id);
-    MPI_Send(&my_id, 1, MPI_INT, 0, REQUEST_TAG, MPI_COMM_WORLD);
+    MPI_Send(&request, 1, MPI_INT, 0, REQUEST_TAG, MPI_COMM_WORLD);
         
     // Wait for partner info from teacher
     MPI_Recv(&partner, 1, MPI_INT, 0, RESPONSE_TAG, MPI_COMM_WORLD, &status);

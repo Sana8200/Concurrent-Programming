@@ -32,7 +32,7 @@ Run (need n+1 processes for n students):
 mpirun -np 5 ./clientServer    # 4 students
 mpirun -np 4 ./clientServer    # 3 students, one works alone
 
-mpirun --oversubscribe -np 7 ./clientServer   # for not enough slots error 
+mpirun --oversubscribe -np 7 ./clientServer   # if not enough slots
 ```
 
 ### MPI functions used 
@@ -46,19 +46,15 @@ mpirun --oversubscribe -np 7 ./clientServer   # for not enough slots error
 
 ### Example Output (4 students)
 ```
-Student 2: Sending pairing request to teacher
+Student 1: Sending pairing request to teacher
 Student 3: Sending pairing request to teacher
 Teacher process is running to pair 3 students with each other...
-Teacher: Received request from Student 3
-Teacher: Received request from Student 2
-Student 1: Sending pairing request to teacher
-Teacher: Pairing Student 3 with Student 2
-Teacher: Received request from Student 1
-Teacher: Student 1 will work alone (odd number)
+Teacher: Pairing Student 1 with Student 3
+Student 3: My partner is Student 1
+Student 1: My partner is Student 3
+Student 2: Sending pairing request to teacher
 Teacher: All students have been paired!
-Student 3: My partner is Student 2
-Student 2: My partner is Student 3
-Student 1: I am working alone (no partner)
+Student 2: I am working alone (no partner)
 ```
 
 - **Distributed**: The program is distributed, processes don't share any memory and they only communicate by sending message to each other using MPI.
