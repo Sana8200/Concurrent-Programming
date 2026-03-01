@@ -14,7 +14,7 @@ If there is an odd number of students, the last student will not have a partner.
 In this case, the student is paired with themselves and works alone.
 
 Students send their IDs to the teacher using MPI_Send(). 
-Since the teacher does not know which student will send first, MPI_Recv() is used with MPI_ANY_SOURCE to receive messages from any student.
+Since the teacher does not know which student will send first (parallel execution is non-deterministic), MPI_Recv() is used with MPI_ANY_SOURCE to receive messages from any studentm, (accepts requests from any source).
 
 After pairing, the teacher sends back the partner ID to each student.
 
@@ -46,9 +46,6 @@ mpirun --oversubscribe -np 7 ./clientServer   # for not enough slots error
 - MPI_Send() - send message
 - MPI_Recv() - receive message (waits until message arrives)
 - MPI_Finalize() - end MPI
-
-### Why MPI_ANY_SOURCE?
-The teacher doesn't know which student will send first (parallel execution is non-deterministic), so it accepts requests from any source.
 
 
 ## Example Output (4 students)
