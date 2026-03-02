@@ -98,20 +98,18 @@ void student(int my_id, int num_students) {
         
         // Check if anyone left to pair with
         if (count == 0) {
-            // I'm the last one - work alone (odd number case)
-            printf("Student %d: I am working alone...\n", my_id);
+            printf("Student %d: I am working alone...\n", my_id);   // I'm the last one - work alone (odd number case)
         } else {
             // Pick random partner from remaining
             int random_id = rand() % count;
             int partner = msg[2 + random_id];
             
-            // Remove partner from list
-            msg[2 + random_id] = msg[2 + count - 1];  // swap with last
+            msg[2 + random_id] = msg[2 + count - 1];  // Remove partner from list - swap with last
             count--;
             
             printf("Student %d: My partner is Student %d\n", my_id, partner);
             
-            // Send to partner (tell them I'm their partner + remaining list)
+            // Send to partner to tell i'm their partner + remaining list 
             msg[0] = my_id;  // I am your partner
             msg[1] = count;
             MPI_Send(msg, msg_size, MPI_INT, partner, TAG, MPI_COMM_WORLD);
