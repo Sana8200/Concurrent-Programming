@@ -25,15 +25,15 @@ Student <-- gets partner  <-- Teacher
 
 Compile:
 ```
-mpicc -o clientServer clientServer.c
+mpicc -o client_server client_server.c
 ```
 
 Run (need n+1 processes for n students):
 ```
-mpirun -np 5 ./clientServer    # 4 students
-mpirun -np 4 ./clientServer    # 3 students, one works alone
+mpirun -np 5 ./client_server    # 4 students
+mpirun -np 4 ./client_server    # 3 students, one works alone
 
-mpirun --oversubscribe -np 7 ./clientServer   # if not enough slots
+mpirun --oversubscribe -np 7 ./client_server   # if not enough slots
 ```
 
 ### MPI functions used 
