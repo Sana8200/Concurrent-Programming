@@ -44,7 +44,7 @@ void teacher(int num_students) {
        and sendd "your turn" message to them. 
        After that, students will handle the rest of the pairing themselves.
     */
-    
+    printf("Teacher preparing to start peer-to-peer pairing for %d students...\n", num_students);
     // Message format: [action, count, student1, student2, ...]
     int msg_size = num_students + 2;
     int *msg = (int*)malloc(msg_size * sizeof(int));
@@ -57,12 +57,11 @@ void teacher(int num_students) {
         msg[2 + i] = i + 1;
     }
     
-    // Pick random student to start (from the list)
-    int random_idx = rand() % num_students;
-    int first = msg[2 + random_idx];
+    // Pick random student to start (from the list) - could be fixed to 1 for deterministic 
+    int random_id = rand() % num_students;
+    int first = msg[2 + random_id];
     
-    printf("Teacher: Starting peer-to-peer pairing for %d students\n", num_students);
-    printf("Teacher: Randomly picked Student %d to start\n\n", first);
+    printf("Teacher: Randomly picked Student %d to start pairing...\n\n", first);
     
     MPI_Send(msg, msg_size, MPI_INT, first, TAG, MPI_COMM_WORLD);
     
@@ -87,7 +86,7 @@ void student(int my_id, int num_students) {
     
     if (action == YOUR_TURN) {
         // It's my turn to pick a partner
-        
+    
         //Remove myself from list
         for (int i = 0; i < count; i++) {
             if (msg[2 + i] == my_id) {
@@ -103,11 +102,11 @@ void student(int my_id, int num_students) {
             printf("Student %d: I am working alone...\n", my_id);
         } else {
             // Pick random partner from remaining
-            int random_idx = rand() % count;
-            int partner = msg[2 + random_idx];
+            int random_id = rand() % count;
+            int partner = msg[2 + random_id];
             
             // Remove partner from list
-            msg[2 + random_idx] = msg[2 + count - 1];  // swap with last
+            msg[2 + random_id] = msg[2 + count - 1];  // swap with last
             count--;
             
             printf("Student %d: My partner is Student %d\n", my_id, partner);
@@ -126,8 +125,8 @@ void student(int my_id, int num_students) {
         
         // If there are students left, pass "your turn" to random one
         if (count > 0) {
-            int random_idx = rand() % count;
-            int next = msg[2 + random_idx];
+            int random_id = rand() % count;
+            int next = msg[2 + random_id];
             
             msg[0] = YOUR_TURN;
             MPI_Send(msg, msg_size, MPI_INT, next, TAG, MPI_COMM_WORLD);
